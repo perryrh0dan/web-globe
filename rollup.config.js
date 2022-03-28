@@ -23,7 +23,6 @@ export default {
     }
   },
   plugins: [
-    replace({'Reflect.decorate': 'undefined'}),
     resolve(),
     commonjs(),
     terser({
@@ -33,6 +32,7 @@ export default {
       mangle: {
         properties: {
           regex: /^__/,
+          reserved: ['__threeObj']
         },
       },
     }),

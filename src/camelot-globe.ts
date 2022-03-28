@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import ThreeGlobe from "three-globe";
-import { WebGLRenderer, Scene } from "three";
+import ThreeGlobe from 'three-globe';
+import { WebGLRenderer, Scene } from 'three';
 import {
   PerspectiveCamera,
   AmbientLight,
@@ -8,17 +8,21 @@ import {
   Color,
   Fog,
   PointLight,
-} from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+} from 'three';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {LitElement, html, css} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import {customElement, query} from 'lit/decorators.js';
 
-import countries from "./files/globe-data-min.json";
-import travelHistory from "./files/my-flights.json";
-import airportHistory from "./files/my-airports.json";
+import countries from './files/globe-data-min.json';
+import airports from './files/airports_filtered.json';
+
+const nizza = { lat: 43.7102, lng: 7.2620, code: "LogiPharma" }
 
 @customElement('camelot-globe')
 export class CamelotGlobe extends LitElement {
+  @query('main') main!: HTMLElement;
+  @query('canvas') canvas!: HTMLCanvasElement;
+
   static override styles = css`
     :host {
       display: block;
@@ -26,51 +30,31 @@ export class CamelotGlobe extends LitElement {
     }
   `;
 
-  /**
-   * The name to say "Hello" to.
-   */
-  @property()
-  name = 'World';
+  private scene: Scene = new Scene()
+  private camera: PerspectiveCamera = new PerspectiveCamera();
 
-  /**
-   * The number of times the button has been clicked.
-   */
-  @property({type: Number})
-  count = 0;
-
-  private root!: HTMLElement;
-  private renderer!: WebGLRenderer; 
-  private camera: any; 
-  private scene!: Scene;
-  private controls: any;
-  private mouseX = 0;
-  private mouseY = 0;
-  private windowHalfX = window.innerWidth / 2;
-  private windowHalfY = window.innerHeight / 2;
+  private renderer?: WebGLRenderer;
+  private controls?: OrbitControls;
   private Globe: any;
 
   constructor() {
-    super()
+    super();
 
-    window.addEventListener("resize", this.onWindowResize, false);
+    window.addEventListener('resize', this.onWindowResize.bind(this), false);
   }
 
-  override firstUpdated () {
-    this.root = this.shadowRoot!.getElementById('root')!
+  override firstUpdated() {
+    const width = this.main.offsetWidth;
+    const height = this.main.offsetHeight;
 
-    const width = this.root.offsetWidth
-    const height = this.root.offsetHeight
-
-    this.renderer = new WebGLRenderer({antialias: true});
+    this.renderer = new WebGLRenderer({antialias: true, canvas: this.canvas, alpha: true});
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(width, height);
 
     // Initialize scene, light
-    this.scene = new Scene();
     this.scene.add(new AmbientLight(0xbbbbbb, 0.3));
-    this.renderer.setClearColor(0xffffff, 0)
-    // this.scene.background = new Color(0x0D1B36);
-    // this.scene.setClearColor(0xffffff, 0)
+    this.renderer?.setAnimationLoop(() => this.paint())
+    this.renderer.setClearColor(0xffffff, 0);
 
     // Initialize camera, light
     this.camera = new PerspectiveCamera();
@@ -89,47 +73,43 @@ export class CamelotGlobe extends LitElement {
     dLight2.position.set(-200, 500, 200);
     this.camera.add(dLight2);
 
-    this.camera.position.z = 400;
+    this.camera.position.z = 320;
     this.camera.position.x = 0;
     this.camera.position.y = 0;
 
     this.scene.add(this.camera);
 
-    // // Additional effects
-    this.scene.fog = new Fog(0x6DC6FA, 400, 6000);
-
-    // Helpers
-    // const axesHelper = new AxesHelper(800);
-    // scene.add(axesHelper);
-    // var helper = new DirectionalLightHelper(dLight);
-    // scene.add(helper);
-    // var helperCamera = new CameraHelper(dLight.shadow.camera);
-    // scene.add(helperCamera);
+    // Additional effects
+    this.scene.fog = new Fog(0x6dc6fa, 400, 6000);
 
     // Initialize controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
-    this.controls.dynamicDampingFactor = 0.01;
     this.controls.enablePan = false;
     this.controls.minDistance = 200;
     this.controls.maxDistance = 500;
     this.controls.rotateSpeed = 0.8;
-    this.controls.zoomSpeed = 1;
+    this.controls.enableZoom = false;
     this.controls.autoRotate = false;
 
     this.controls.minPolarAngle = Math.PI / 3.5;
     this.controls.maxPolarAngle = Math.PI - Math.PI / 3;
 
-    // Gen random data
-    const N = 20;
+    // Shuffle array
+    const shuffled = airports.sort(() => 0.5 - Math.random());
 
-    const arcsData = [...Array(N).keys()].map(() => ({
-      startLat: (Math.random() - 0.5) * 180,
-      startLng: (Math.random() - 0.5) * 360,
-      endLat: (Math.random() - 0.5) * 180,
-      endLng: (Math.random() - 0.5) * 360,
-      color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
-    }));
+    // Get sub-array of first n elements after shuffled
+    const arcsData = shuffled.slice(0, 30).map((startAirport) => {
+      const endAirport = airports[ Math.floor((airports.length - 1) * Math.random())]
+
+      return {
+        startLat: startAirport.lat,
+        startLng: startAirport.lng,
+        endLat: endAirport.lat,
+        endLng: endAirport.lng,
+        color: ['#FF567B', '#4397FF'][Math.round(Math.random() * 1)],
+      }
+    });
 
     this.Globe = new ThreeGlobe({
       waitForGlobeReady: true,
@@ -139,85 +119,78 @@ export class CamelotGlobe extends LitElement {
       .hexPolygonResolution(3)
       .hexPolygonMargin(0.7)
       .showAtmosphere(true)
-      .atmosphereColor("#3a228a")
+      .atmosphereColor('#53A1EC')
       .atmosphereAltitude(0.25)
       .hexPolygonColor((e: any) => {
         if (
-          ["KGZ", "KOR", "THA", "RUS", "UZB", "IDN", "KAZ", "MYS"].includes(
+          ['DEU'].includes(
             e.properties.ISO_A3
           )
         ) {
-          return "rgba(255,255,255, 1)";
-        } else return "rgba(255,255,255, 0.7)";
+          return 'rgba(255,0,0, 1)';
+        } else return 'rgba(255,255,255, 0.7)';
       })
-      .labelsData(airportHistory.airports)
-      .labelColor(() => "#ffcb21")
-      .labelDotOrientation((e: any) => {
-        return e.text === "ALA" ? "top" : "right";
-      })
-      // .labelDotRadius(0.3)
-      // .labelSize((e: any) => e.size)
-      // .labelText("city")
-      // .labelResolution(6)
-      // .labelAltitude(0.01)
-      // .pointsData(airportHistory.airports)
-      // .pointColor(() => "#ffffff")
-      // .pointsMerge(true)
-      // .pointAltitude(0.07)
-      // .pointRadius(0.05);
-
+      .labelsData([...airports, nizza])
+      .labelColor(() => '#FFEE89')
+      .labelText((e: any) => e.code)
+      .labelDotRadius(0.3)
+      .labelText("code")
+      .labelResolution(6)
+      .labelAltitude(0.01)
+      .pointsData([...airports, nizza])
+      .pointColor(() => "#FFEE89")
+      .pointsMerge(true)
+      .pointAltitude(0.07)
+      .pointRadius(0.05);
 
     // NOTE Arc animations are followed after the globe enters the scene
     setTimeout(() => {
-      this.Globe.arcsData(travelHistory.flights)
-      .arcColor((e: any) => {
-        return e.status ? "#9cff00" : "#FF4000";
-      })
-      .arcAltitude((e: any) => {
-        return e.arcAlt;
-      })
-      .arcStroke((e: any) => {
-        return e.status ? 0.5 : 0.3;
-      })
-      .arcDashLength(0.9)
-      .arcDashGap(4)
-      .arcDashAnimateTime(1000)
-      .arcsTransitionDuration(1000)
-    }, 10000);
+      this.Globe.arcsData(arcsData)
+        .arcColor((e: any) => {
+          return e.color;
+        })
+        .arcDashLength(0.7)
+        .arcDashGap(4)
+        .arcDashAnimateTime(3000)
+        .arcStroke(1)
+        .arcsTransitionDuration(1000)
+        .arcDashInitialGap(() => Math.random() * 5);
+    }, 1000);
+
+    this.Globe.rotateY(-Math.PI * (1 / 9));
+    // this.Globe.rotateZ(-Math.PI / 4);
 
     const globeMaterial = this.Globe.globeMaterial();
-    globeMaterial.color = new Color(0x3a228a);
-    globeMaterial.emissive = new Color(0x220038);
+    globeMaterial.color = new Color(0x0057FF);
+    globeMaterial.emissive = new Color(0x53A1EC);
     globeMaterial.emissiveIntensity = 0.1;
     globeMaterial.shininess = 2;
-  
+
     this.scene.add(this.Globe);
 
-    this.draw();
-    this.root?.appendChild(this.renderer.domElement)
+    this.paint();
   }
 
-  draw() {
+  paint() {
     // this.Globe.rotation.x += 0.001;
     this.Globe.rotation.y += 0.001;
 
-    this.controls.update()
-    this.renderer.render( this.scene, this.camera );
-    requestAnimationFrame( this.draw.bind(this) );
+    this.renderer!.render(this.scene, this.camera);
+    this.controls!.update()
   }
 
   override render() {
     return html`
-      <div id="root" style="height: 100%; width: 100%"></div>
+    <main style="height: 100%; width: 100%">
+      <canvas>
+    </main>
     `;
   }
-  
+
   onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.aspect = this.main.offsetWidth / this.main.offsetHeight;
     this.camera.updateProjectionMatrix();
-    this.windowHalfX = window.innerWidth / 1.5;
-    this.windowHalfY = window.innerHeight / 1.5;
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer!.setSize(this.main.offsetWidth, this.main.offsetHeight);
   }
 }
 
