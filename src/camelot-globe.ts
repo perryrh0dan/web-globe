@@ -122,13 +122,7 @@ export class CamelotGlobe extends LitElement {
       .atmosphereColor('#53A1EC')
       .atmosphereAltitude(0.25)
       .hexPolygonColor((e: any) => {
-        if (
-          ['DEU'].includes(
-            e.properties.ISO_A3
-          )
-        ) {
-          return 'rgba(255,0,0, 1)';
-        } else return 'rgba(255,255,255, 0.7)';
+        return 'rgba(255,255,255, 0.7)';
       })
       .labelsData([...airports, nizza])
       .labelColor(() => '#FFEE89')
