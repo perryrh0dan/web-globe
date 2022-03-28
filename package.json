@@ -1,5 +1,5 @@
 {
-  "name": "@lit/lit-starter-ts",
+  "name": "@camelot/web-globe",
   "private": true,
   "version": "1.0.2",
   "description": "A simple web component",
@@ -32,8 +32,6 @@
     "typescript",
     "lit"
   ],
-  "author": "Google LLC",
-  "license": "BSD-3-Clause",
   "dependencies": {},
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.5.7",
