@@ -4,15 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+import json from "@rollup/plugin-json";
 import summary from 'rollup-plugin-summary';
 import {terser} from 'rollup-plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
+import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-  input: 'my-element.js',
+  input: 'camelot-globe.js',
   output: {
-    file: 'my-element.bundled.js',
+    file: 'dist/camelot-globe.js',
     format: 'esm',
   },
   onwarn(warning) {
@@ -23,6 +25,7 @@ export default {
   plugins: [
     replace({'Reflect.decorate': 'undefined'}),
     resolve(),
+    commonjs(),
     terser({
       ecma: 2017,
       module: true,
@@ -33,6 +36,6 @@ export default {
         },
       },
     }),
-    summary(),
+    json(),
   ],
 };

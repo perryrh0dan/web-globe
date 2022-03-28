@@ -3,9 +3,23 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Lit Starter Kit</title>
+    <title>Camelot Globe Demo</title>
+    <script type="module" src="./dist/camelot-globe.js"></script>
+    <!-- <script type="module" src="./camelot-globe.js"></script> -->
+    <style>
+      body {
+        background-color: #0D1B36;
+      }
+
+      camelot-globe {
+        width: 1500px;
+        height: 1000px;
+      }
+    </style>
   </head>
   <body>
-    <a href="/dev/index.html">Component Demo</a>
+    <div>
+      <camelot-globe></camelot-globe>
+    </div>
   </body>
 </html>

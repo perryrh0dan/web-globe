@@ -3,7 +3,7 @@
 /test/
 custom-elements.json
 # top level source
-my-element.js
-my-element.js.map
-my-element.d.ts
-my-element.d.ts.map
+camelot-globe.js
+camelot-globe.js.map
+camelot-globe.d.ts
+camelot-globe.d.ts.map
