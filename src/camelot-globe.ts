@@ -11,7 +11,7 @@ import {
 } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {LitElement, html, css} from 'lit';
-import {customElement, query} from 'lit/decorators.js';
+import {customElement, property, query} from 'lit/decorators.js';
 
 import countries from './files/globe-data-min.json';
 import airports from './files/airports_filtered.json';
@@ -36,6 +36,12 @@ export class CamelotGlobe extends LitElement {
   private renderer?: WebGLRenderer;
   private controls?: OrbitControls;
   private Globe: any;
+
+  @property()
+  private rotateSpeed = 1;
+
+  @property()
+  private arcSpeed = 1;
 
   constructor() {
     super();
@@ -145,7 +151,7 @@ export class CamelotGlobe extends LitElement {
         })
         .arcDashLength(0.7)
         .arcDashGap(4)
-        .arcDashAnimateTime(3000)
+        .arcDashAnimateTime(this.arcSpeed !== 0 ? 1/this.arcSpeed * 3000 : 0)
         .arcStroke(1)
         .arcsTransitionDuration(1000)
         .arcDashInitialGap(() => Math.random() * 5);
@@ -166,8 +172,7 @@ export class CamelotGlobe extends LitElement {
   }
 
   paint() {
-    // this.Globe.rotation.x += 0.001;
-    this.Globe.rotation.y += 0.001;
+    this.Globe.rotation.y += this.rotateSpeed * 0.001;
 
     this.renderer!.render(this.scene, this.camera);
     this.controls!.update()
