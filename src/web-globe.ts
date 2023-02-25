@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import ThreeGlobe from 'three-globe';
 import { WebGLRenderer, Scene } from 'three';
 import {
@@ -13,12 +12,12 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {LitElement, html, css} from 'lit';
 import {customElement, property, query} from 'lit/decorators.js';
 
-import countries from './files/globe-data-min.json';
-import airports from './files/airports_filtered.json';
+import {countries} from './countries';
+import {airports} from './airports';
 
 const nizza = { lat: 43.7102, lng: 7.2620, code: "LogiPharma" }
 
-@customElement('camelot-globe')
+@customElement('web-globe')
 export class CamelotGlobe extends LitElement {
   @query('main') main!: HTMLElement;
   @query('canvas') canvas!: HTMLCanvasElement;
@@ -37,11 +36,14 @@ export class CamelotGlobe extends LitElement {
   private controls?: OrbitControls;
   private Globe: any;
 
-  @property()
+  @property({ type: Number })
   private rotateSpeed = 1;
 
-  @property()
+  @property({ type: Number })
   private arcSpeed = 1;
+
+  @property({ type: Boolean })
+  private enabledZoom = false;
 
   constructor() {
     super();
@@ -95,7 +97,7 @@ export class CamelotGlobe extends LitElement {
     this.controls.minDistance = 200;
     this.controls.maxDistance = 500;
     this.controls.rotateSpeed = 0.8;
-    this.controls.enableZoom = false;
+    this.controls.enableZoom = this.enabledZoom;
     this.controls.autoRotate = false;
 
     this.controls.minPolarAngle = Math.PI / 3.5;
@@ -181,7 +183,7 @@ export class CamelotGlobe extends LitElement {
   override render() {
     return html`
     <main style="height: 100%; width: 100%">
-      <canvas>
+      <canvas></canvas>
     </main>
     `;
   }
@@ -195,6 +197,6 @@ export class CamelotGlobe extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'camelot-globe': CamelotGlobe;
+    'web-globe': CamelotGlobe;
   }
 }

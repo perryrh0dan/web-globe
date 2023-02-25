@@ -1,9 +1,8 @@
 /node_modules/
-/lib/
-/test/
-custom-elements.json
+/temp
+
 # top level source
-camelot-globe.js
-camelot-globe.js.map
-camelot-globe.d.ts
-camelot-globe.d.ts.map
+web-globe.js
+web-globe.js.map
+web-globe.d.ts
+web-globe.d.ts.map

@@ -3,24 +3,25 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Camelot Globe Demo</title>
-    <script type="module" src="https://globe.tpoe.dev/camelot-globe-1.1.0.js"></script>
-    <!-- <script type="module" src="./dist/camelot-globe.js"></script> -->
-    <!-- <script type="module" src="./camelot-globe.js"></script> -->
+    <title>Web Globe Demo</title>
+    <!-- <script type="module" src="https://globe.tpoe.dev/web-globe-1.2.0.js"></script> -->
+    <script type="module" src="./dist/web-globe.js"></script>
     <style>
       body {
-        height: 100vh;
-        margin: 0;
         background-color: #0D1B36;
+        height: 100vh;
+        box-sizing: border-box;
+        padding: 2rem;
+        margin: 0;
       }
 
-      camelot-globe {
+      web-globe {
         width: 100%;
         height: 100%;
       }
     </style>
   </head>
   <body>
-    <camelot-globe arcSpeed="5" rotateSpeed="2"></camelot-globe>
+    <web-globe arcSpeed="2" rotateSpeed="1" enabledZoom></web-globe>
   </body>
 </html>

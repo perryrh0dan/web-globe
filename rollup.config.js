@@ -1,13 +1,12 @@
-import json from "@rollup/plugin-json";
 import summary from 'rollup-plugin-summary';
-import {terser} from 'rollup-plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import terser from "@rollup/plugin-terser";
 
 export default {
-  input: 'camelot-globe.js',
+  input: 'temp/web-globe.js',
   output: {
-    file: 'dist/camelot-globe.js',
+    file: 'dist/web-globe.js',
     format: 'esm',
   },
   onwarn(warning) {
@@ -29,7 +28,6 @@ export default {
         },
       },
     }),
-    json(),
     summary(),
   ],
 };
