@@ -1,4 +1,10 @@
-# Web Globe
+<h1 align="center">
+  Web Globe
+</h1>
+
+<div align="center">
+  <img alt="Preview" width="50%" src="media/preview.gif"/>
+</div>
 
 ## Demo
 
